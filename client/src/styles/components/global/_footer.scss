@@ -1,0 +1,16 @@
+.footer {
+  background-color: #101010;
+
+  &__container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  &__list {
+    @include flex-container(row, space-between, center);
+    gap: 2rem;
+  }
+
+  &__item {
+  }
+}

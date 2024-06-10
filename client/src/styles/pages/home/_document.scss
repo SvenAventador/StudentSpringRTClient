@@ -1,0 +1,30 @@
+.documents-page {
+  &__container {
+    @include flex-container(column, center, center);
+    gap: 4rem;
+    padding: 4rem 0;
+  }
+}
+
+.box {
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+
+  text-align: center;
+}
+.box.green {
+  background-color: #8bc34a;
+}
+.box.blue {
+  background-color: #009688;
+}
+.box.red {
+  background-color: #f44336;
+}
+.box.blue div {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #00796b;
+  border-radius: 5px;
+}

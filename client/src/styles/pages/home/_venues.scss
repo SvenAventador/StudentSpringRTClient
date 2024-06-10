@@ -1,0 +1,49 @@
+.venues-page {
+  &__container {
+    @include flex-container(column, center, center);
+    gap: 6rem;
+    padding: 4rem 0;
+  }
+
+  .venue {
+    width: 100%;
+    background-color: #141414;
+    @include flex-container(row, space-between, center);
+    gap: 2rem;
+    border: 2px solid #ececec;
+
+
+    &__image img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      transform: scale(1.1);
+    }
+
+    &__title {
+      margin-bottom: 4rem;
+      font-size: 2rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    &__details {
+      width: 50%;
+      height: 100%;
+      &-list {
+        @include flex-container(column, flex-start, center);
+        gap: 2rem;
+      }
+
+      &-item {
+        color: #f8f8f8;
+        font-size: 1.5rem;
+
+        span {
+          font-weight: bold;
+          color: #ff3d3d;
+        }
+      }
+    }
+  }
+}

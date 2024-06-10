@@ -1,0 +1,31 @@
+.header {
+  background: #1e1d46;
+
+  &__container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__nav {
+    @include flex-container(row, center, center);
+
+    .logo {
+      margin-left: 2rem;
+      margin-right: 2rem;
+    }
+
+    &-list {
+      width: 100%;
+      @include flex-container(row, center, center);
+      gap: 2rem;
+      list-style-type: none;
+    }
+
+    &-item {
+      width: max-content;
+    }
+  }
+}

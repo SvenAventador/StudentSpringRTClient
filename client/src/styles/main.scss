@@ -1,0 +1,14 @@
+@import "./reset.scss";
+@import "./base.scss";
+@import "./root.scss";
+
+@import "pages/home/contact";
+@import "pages/home/document";
+@import "pages/home/front";
+@import "pages/home/venues";
+@import "pages/auth/auth";
+
+@import "./components/global/footer";
+@import "./components/global/header";
+@import "./components/global/modal";
+@import "./components/team/teamList";

@@ -3,10 +3,15 @@ import {useNavigate} from "react-router-dom";
 import {useUser} from "../../stores/User";
 import Swal from "sweetalert2";
 import {MAIN_PATH} from "../../utils/const";
-import {Button, Layout, Menu} from "antd";
+import {
+    Button,
+    Layout,
+    Menu
+} from "antd";
 import Sider from "antd/es/layout/Sider";
 import {
-    AppstoreAddOutlined, LogoutOutlined,
+    AppstoreAddOutlined,
+    LogoutOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     TeamOutlined,
@@ -34,7 +39,6 @@ const Validators = () => {
             Swal.fire({
                 title: "Внимание",
                 text: 'До скорых встреч, друг! Ждем тебя снова! ❤️',
-                icon: "success"
             }).then(() => {
                 history(MAIN_PATH);
             })

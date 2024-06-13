@@ -34,7 +34,6 @@ const Vocal = (props) => {
             Swal.fire(({
                 title: 'Внимание!',
                 text: 'Данный номер успешно удален!',
-                icon: 'success'
             })).then(() => {
                 onOk()
             })
@@ -46,7 +45,6 @@ const Vocal = (props) => {
     const showModal = (id) => {
         setIsActive(true)
         getOneApplication(id).then(({application}) => {
-            console.log(application)
             setOneApplication(application)
         })
     }
@@ -70,7 +68,7 @@ const Vocal = (props) => {
             key: 'category'
         },
         {
-            title: 'Директор',
+            title: 'Руководитель',
             dataIndex: 'fioDirector',
             key: 'fioDirector'
         },
@@ -161,14 +159,22 @@ const Vocal = (props) => {
                     <strong>Форма участия: </strong>
                     {record.form_participation?.form}
                 </p>
-                <p>
-                    <strong>Участники: </strong>
-                    {participantNames}
-                </p>
-                <p>
-                    <strong>Техническая группа: </strong>
-                    {technicalGroupNames}
-                </p>
+                {
+                    participantNames.length > 0 && (
+                        <p>
+                            <strong>Участники: </strong>
+                            {participantNames}
+                        </p>
+                    )
+                }
+                {
+                    technicalGroupNames.length > 0 && (
+                        <p>
+                            <strong>Техническая группа: </strong>
+                            {technicalGroupNames}
+                        </p>
+                    )
+                }
                 <p>
                     <b>Статус номера: </b>
                     <span
@@ -176,6 +182,13 @@ const Vocal = (props) => {
                         {getStatusText(record.applicationStatusId, accountStatus)}
                     </span>
                 </p>
+                {
+                    record.application_comments.length !== 0 && (
+                        <span>
+                            {record.application_comments[0].status}
+                        </span>
+                    )
+                }
             </div>
         )
     }

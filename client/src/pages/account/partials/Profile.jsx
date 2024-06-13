@@ -10,7 +10,10 @@ import {
 import {UploadOutlined} from "@ant-design/icons";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-import {getOne, settingProfile} from "../../../http/profile";
+import {
+    getOne,
+    settingProfile
+} from "../../../http/profile";
 import {useUser} from "../../../stores/User";
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -21,10 +24,9 @@ const Profile = () => {
 
     const {user} = useUser()
     React.useEffect(() => {
-        getOne(user.id).then((data) => {
-            const positionOrStudyDocument = data?.positionOrStudyDocument;
-            const isStudent = positionOrStudyDocument && positionOrStudyDocument.includes('.jpg');
-
+        user && getOne(user?.id).then((data) => {
+            console.log(data)
+            const isStudent = data?.positionOrStudyDocument.includes('.jpg')
             setStudyOrWork(isStudent ? 'учится' : 'работает');
 
             form.setFieldsValue({
@@ -39,18 +41,17 @@ const Profile = () => {
                 placeOfStudyOfWork: data?.placeOfStudyOfWork || '',
                 positionDocument: isStudent ? [{
                     uid: '-1',
-                    name: positionOrStudyDocument,
+                    name: 'Справка с места учебы',
                     status: 'done',
-                    url: `${process.env.REACT_APP_API_PATH}${positionOrStudyDocument}`
+                    url: `${process.env.REACT_APP_API_PATH}${data?.positionOrStudyDocument}`
                 }] : [],
                 position: isStudent ? '' : data?.positionOrStudyDocument
             });
         })
-    }, [user.id, form])
+    }, [user?.id, form])
 
     const onFinish = (values) => {
         const profile = new FormData()
-        profile.append('id', user.id)
         profile.append('surname', values.surname)
         profile.append('name', values.name)
         profile.append('patronymic', values.patronymic)
@@ -69,13 +70,11 @@ const Profile = () => {
 
         settingProfile(profile).then(() => {
             return Swal.fire({
-                icon: 'success',
                 title: 'Внимание!',
                 text: 'Поздравляем с успешным действием!'
             })
         }).catch((error) => {
             return Swal.fire({
-                icon: 'error',
                 title: 'Внимание!',
                 text: error.response.data.message
             })
@@ -101,6 +100,7 @@ const Profile = () => {
                       gender: 'Мужской'
                   }}
                   layout="vertical">
+
                 <Form.Item
                     name="surname"
                     label="Фамилия"
@@ -151,7 +151,7 @@ const Profile = () => {
                                borderColor: '#d9d9d9',
                                borderRadius: '7px',
                                paddingLeft: '.5rem'
-                    }} />
+                           }}/>
                 </Form.Item>
 
                 <Form.Item name="gender"
@@ -223,7 +223,8 @@ const Profile = () => {
                                    message: 'Пожалуйста, выберите один вариант!'
                                }
                            ]}>
-                    <Radio.Group value={studyOrWork} onChange={handleStudyOrWorkChange}>
+                    <Radio.Group value={studyOrWork}
+                                 onChange={handleStudyOrWorkChange}>
                         <Radio value="учится"
                                style={{
                                    color: 'white'
@@ -255,6 +256,8 @@ const Profile = () => {
                             <Upload name="positionOrStudyDocument"
                                     action="/upload"
                                     listType="picture"
+                                    maxCount={1}
+                                    accept=".jpg, .jpeg, .png"
                                     beforeUpload={() => false}>
                                 <Button icon={<UploadOutlined/>}>
                                     Загрузить

@@ -4,17 +4,21 @@ import {useUser} from "../../../stores/User";
 import { Table} from "antd";
 import {NavLink} from "react-router-dom";
 import {getDocument} from "../../../http/admin";
-const {inclineFirstname, inclineLastname, inclineMiddlename } = require('lvovich')
+const {
+    inclineFirstname,
+    inclineLastname,
+    inclineMiddlename
+} = require('lvovich')
 
 const Documents = () => {
     const {user} = useUser()
     const [document, setDocument] = React.useState([])
 
     React.useEffect(() => {
-        getDocument(user.id).then((data) => {
+        user && getDocument(user?.id).then((data) => {
             setDocument(data)
         })
-    }, [user.id])
+    }, [user?.id])
 
     const columns = [
         {
@@ -29,7 +33,7 @@ const Documents = () => {
             key: 'documentName',
             render: (text, record, index) => (
                 <NavLink to={`${process.env.REACT_APP_API_PATH + record.document}`}>
-                    Документ об участии от {inclineLastname(record.profile.surname, 'genitive')} {inclineFirstname(record.profile.name, 'genitive')} { inclineMiddlename(record?.profile?.patronymic, 'genitive')}
+                    Документ об участии от {record.profile && inclineLastname(record?.profile?.surname, 'genitive')} {record.profile && inclineFirstname(record?.profile?.name, 'genitive')} {record.profile && inclineMiddlename(record?.profile?.patronymic, 'genitive')}
                 </NavLink>
             ),
         },

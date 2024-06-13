@@ -3,13 +3,13 @@ import {useUser} from "../../stores/User";
 import {useNavigate} from "react-router-dom";
 import Swal from "sweetalert2";
 import {MAIN_PATH} from "../../utils/const";
-import Main from "./partials/Main";
 import {
     AppstoreAddOutlined,
-    HomeOutlined, LogoutOutlined,
+    LogoutOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
-    TeamOutlined, UnorderedListOutlined,
+    TeamOutlined,
+    UnorderedListOutlined,
     UserOutlined
 } from "@ant-design/icons";
 import {
@@ -31,7 +31,7 @@ const Person = () => {
         setCollapsed(!collapsed)
     }
 
-    const [selectedMenuItem, setSelectedMenuItem] = React.useState('main')
+    const [selectedMenuItem, setSelectedMenuItem] = React.useState('profile')
     let {
         logoutUser
     } = useUser()
@@ -41,7 +41,6 @@ const Person = () => {
             Swal.fire({
                 title: "Внимание",
                 text: 'До скорых встреч, друг! Ждем тебя снова! ❤️',
-                icon: "success"
             }).then(() => {
                 history(MAIN_PATH);
             })
@@ -78,22 +77,14 @@ const Person = () => {
                       style={{
                           backgroundColor: '#19025c'
                       }}>
-                    <Menu.Item key="1"
-                               icon={<HomeOutlined/>}
-                               onClick={() => setSelectedMenuItem('main')}
-                               style={{
-                                   color: '#fff'
-                               }}>
-                        Главная
-                    </Menu.Item>
-                    <Menu.Item key="2" icon={<UserOutlined/>}
+                    <Menu.Item key="1" icon={<UserOutlined/>}
                                onClick={() => setSelectedMenuItem('profile')}
                                style={{
                                    color: '#fff'
                                }}>
                         Профиль
                     </Menu.Item>
-                    <Menu.Item key="3"
+                    <Menu.Item key="2"
                                icon={<TeamOutlined/>}
                                onClick={() => setSelectedMenuItem('team')}
                                style={{
@@ -101,7 +92,7 @@ const Person = () => {
                                }}>
                         Команда
                     </Menu.Item>
-                    <Menu.Item key="4"
+                    <Menu.Item key="3"
                                icon={<AppstoreAddOutlined/>}
                                onClick={() => setSelectedMenuItem('application')}
                                style={{
@@ -109,7 +100,7 @@ const Person = () => {
                                }}>
                         Заявки
                     </Menu.Item>
-                    <Menu.Item key="5"
+                    <Menu.Item key="4"
                                icon={<UnorderedListOutlined />}
                                onClick={() => setSelectedMenuItem('document')}
                                style={{
@@ -117,7 +108,7 @@ const Person = () => {
                                }}>
                         Сформированные документы для участия
                     </Menu.Item>
-                    <Menu.Item key="6"
+                    <Menu.Item key="5"
                                icon={<LogoutOutlined/>}
                                onClick={handleLogout}
                                style={{
@@ -142,7 +133,6 @@ const Person = () => {
                     <div style={{
                         flex: 1,
                     }}>
-                        {selectedMenuItem === 'main' && <Main/>}
                         {selectedMenuItem === 'profile' && <Profile/>}
                         {selectedMenuItem === 'team' && <Team/>}
                         {selectedMenuItem === 'application' && <Application/>}

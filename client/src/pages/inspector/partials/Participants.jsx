@@ -131,7 +131,6 @@ const Participants = () => {
 
     React.useEffect(() => {
         getAllProfile().then((data) => {
-            console.log(data);
             setAllProfiles(data);
         });
     }, []);
@@ -145,7 +144,7 @@ const Participants = () => {
                 getAllProfile().then((data) => {
                     setAllProfiles(data);
                 });
-                Swal.fire({
+                return Swal.fire({
                     title: 'Внимание!',
                     text: 'Поздравляем с успешным изменением статуса аккаунта!',
                     icon: "success"
@@ -285,7 +284,7 @@ const Participants = () => {
                 render: (_, record) => (
                     <Select defaultValue={record.account_status.status}
                             onChange={(value) => handleSelectChange(value, record)}
-                            style={{width: 120}}>
+                            style={{width: 250}}>
                         <Option value="2">На проверке</Option>
                         <Option value="3">Отклонено</Option>
                         <Option value="4">Принято</Option>
@@ -317,7 +316,6 @@ const Participants = () => {
                                         return Swal.fire({
                                             title: 'Внимание!',
                                             text: 'Поздравляем с успешынм удалением участника!',
-                                            icon: "success"
                                         })
                                     })
                                 }}>
@@ -363,9 +361,12 @@ const Participants = () => {
                             setAllProfiles(data);
                         });
                     }}>Отмена</Button>,
-                    <Button key="save" type="primary" onClick={handleSaveRejectReason}>Сохранить</Button>,
-                ]}
-            >
+                    <Button key="save"
+                            type="primary"
+                            onClick={handleSaveRejectReason}>
+                        Сохранить
+                    </Button>,
+                ]}>
                 <Input.TextArea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
@@ -373,6 +374,7 @@ const Participants = () => {
                     placeholder="Введите причину отклонения"
                 />
             </Modal>
+
             <Modal title="Изменить данные руководителя"
                    open={mainModal}
                    footer={[
@@ -390,8 +392,7 @@ const Participants = () => {
                                }}>
                             Сохранить изменения
                        </Button>
-                   ]}
-            >
+                   ]}>
                 <PhoneInput country={'ru'}
                             placeholder="+7 (123) 456-78-90"
                             value={mainPhone}

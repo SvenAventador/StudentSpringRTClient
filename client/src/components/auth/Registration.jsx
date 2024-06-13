@@ -18,7 +18,6 @@ const Registration = () => {
             return Swal.fire({
                 title: 'Внимание!',
                 text: 'Извините, Ваши пароли не совпадают!',
-                icon: "error"
             })
         }
 
@@ -32,13 +31,11 @@ const Registration = () => {
             return Swal.fire({
                 title: 'Внимание!',
                 text: 'Добро пожаловать в семью!',
-                icon: "success"
             })
         }).catch((error) => {
             return Swal.fire({
                 title: 'Внимание!',
                 text: error.response.data.message,
-                icon: "error"
             })
         })
     }

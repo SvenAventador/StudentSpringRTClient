@@ -1,7 +1,13 @@
 import React from 'react';
 import Title from "antd/es/typography/Title";
 import {useUser} from "../../../stores/User";
-import {deleteAll, deleteOne, getAll, getOne, updateStatus} from "../../../http/participant";
+import {
+    deleteAll,
+    deleteOne,
+    getAll,
+    getOne,
+    updateStatus
+} from "../../../http/participant";
 import {
     Button,
     Popconfirm,
@@ -25,10 +31,10 @@ const Team = () => {
     const [isActive, setIsActive] = React.useState(false)
 
     React.useEffect(() => {
-        getAll(user.id).then((data) => {
+        user && getAll(user?.id).then((data) => {
             setMyTeam(data)
         })
-    }, [user.id])
+    }, [user?.id])
 
     React.useEffect(() => {
         getAllParticipantStatuses().then((data) => {
@@ -52,6 +58,7 @@ const Team = () => {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
+            render: (record, text, index) => index + 1
         },
         {
             title: 'Фамилия',
@@ -96,7 +103,6 @@ const Team = () => {
                                                             setMyTeam(data)
                                                         }).then(() => {
                                                             return Swal.fire({
-                                                                icon: 'success',
                                                                 title: 'Внимание!',
                                                                 text: 'Поздравляем с успешным удалением участника!'
                                                             })
@@ -131,11 +137,10 @@ const Team = () => {
     )
 
     const expandedRowRender = (record) => {
-        console.log(record)
         return (
             <div>
                 <p>
-                    <b>Email:</b> {record.email}
+                    <b>Почта:</b> {record.email}
                 </p>
                 <p>
                     <b>Телефон:</b> {record.phone}
@@ -151,7 +156,7 @@ const Team = () => {
                     <b>Место учебы/работы:</b> {record.placeOfStudyOfWork}
                 </p>
                 <p>
-                    <b>Специализация:</b> {record.specialization}
+                    <b>Специальность:</b> {record.specialization}
                 </p>
                 <p>
                     <b>{record.positionOrStudyDocument.includes('.jpg') ? 'Документ, подствержающий учебу' : 'Должность'} </b>
@@ -172,7 +177,9 @@ const Team = () => {
                 </p>
                 <p>
                     <b>Статус аккаунта:</b>
-                    <span style={{color: record.accountStatusId === 1 ? 'gray' : record.accountStatusId === 2 ? 'orange' : record.accountStatusId === 3 ? 'red' : 'green'}}>
+                    <span style={{
+                        color: record.accountStatusId === 1 ? 'gray' : record.accountStatusId === 2 ? 'orange' : record.accountStatusId === 3 ? 'red' : 'green'
+                    }}>
                         {getStatusText(record.accountStatusId, accountStatus)}
                     </span>
                 </p>
@@ -180,7 +187,6 @@ const Team = () => {
                     record.participant_comments.length > 0 ? (
                         <p>Причина отклонения: {record.participant_comments[0].status}</p>
                     ) : null
-
                 }
             </div>
         )
@@ -197,7 +203,6 @@ const Team = () => {
             setOneParticipant(null)
         }
     }
-
     const closeModal = () => {
         setIsActive(false)
         getAll(user.id).then((data) => {
@@ -215,11 +220,14 @@ const Team = () => {
 
             <Table columns={columns}
                    dataSource={myTeam.map((team) => ({
-                       ...team, id: team.id
+                       ...team,
+                       id: team.id
                    }))}
                    bordered
                    rowKey="id"
-                   pagination={{size: 5}}
+                   pagination={{
+                       size: 5
+                   }}
                    locale={{
                        emptyText: customEmptyText
                    }}
@@ -229,64 +237,65 @@ const Team = () => {
                    title={() => {
                        return (
                            <Space size="large">
-                               {myTeam.length === 0 || isAnyAccountStatusIdEqualTo1 ? (
-                                   <>
-                                       <Button style={{
-                                           backgroundColor: 'green',
-                                           color: 'white'
-                                       }}
-                                               onClick={() => showModal(null)}>
-                                           Добавить участника
-                                       </Button>
-                                       <Popconfirm title="Вы уверены, что хотите удалить всех участников?"
-                                                   okText="Да"
-                                                   onConfirm={() => {
-                                                       deleteAll(user.id).then(() => {
-                                                           getAll(user.id).then((data) => {
-                                                               setMyTeam(data)
-                                                           }).then(() => {
-                                                               return Swal.fire({
-                                                                   icon: 'success',
-                                                                   title: 'Внимание!',
-                                                                   text: 'Поздравляем с успешным удалением участников!'
+                               {
+                                   myTeam.length === 0 || isAnyAccountStatusIdEqualTo1 ? (
+                                       <>
+                                           <Button style={{
+                                               backgroundColor: 'green',
+                                               color: 'white'
+                                           }}
+                                                   onClick={() => showModal(null)}>
+                                               Добавить участника
+                                           </Button>
+                                           <Popconfirm title="Вы уверены, что хотите удалить всех участников?"
+                                                       okText="Да"
+                                                       onConfirm={() => {
+                                                           deleteAll(user.id).then(() => {
+                                                               getAll(user.id).then((data) => {
+                                                                   setMyTeam(data)
+                                                               }).then(() => {
+                                                                   return Swal.fire({
+                                                                       title: 'Внимание!',
+                                                                       text: 'Поздравляем с успешным удалением участников!'
+                                                                   })
                                                                })
                                                            })
-                                                       })
-                                                   }}
-                                                   cancelText="Отмена">
-                                           <Button style={{
-                                               backgroundColor: 'red',
-                                               color: 'white'
-                                           }}>
-                                               Удалить всех участников
-                                           </Button>
-                                       </Popconfirm>
-                                       <Popconfirm
-                                           title="Вы уверены, что хотите сохранить всех участников? После принятия данного действия, это уже изменить нельзя!"
-                                           okText="Да"
-                                           onConfirm={() => {
-                                               updateStatus(user.id).then(() => {
-                                                   getAll(user.id).then((data) => {
-                                                       setMyTeam(data)
-                                                   }).then(() => {
-                                                       return Swal.fire({
-                                                           icon: 'success',
-                                                           title: 'Внимание!',
-                                                           text: 'Поздравляем с успешным сохранением участников!'
+                                                       }}
+                                                       cancelText="Отмена">
+                                               <Button style={{
+                                                   backgroundColor: 'red',
+                                                   color: 'white'
+                                               }}>
+                                                   Удалить всех участников
+                                               </Button>
+                                           </Popconfirm>
+                                           <Popconfirm
+                                               title="Вы уверены, что хотите сохранить всех участников? После принятия данного действия, это уже изменить нельзя!"
+                                               okText="Да"
+                                               onConfirm={() => {
+                                                   updateStatus(user.id).then(() => {
+                                                       getAll(user.id).then((data) => {
+                                                           setMyTeam(data)
+                                                       }).then(() => {
+                                                           return Swal.fire({
+                                                               icon: 'success',
+                                                               title: 'Внимание!',
+                                                               text: 'Поздравляем с успешным сохранением участников!'
+                                                           })
                                                        })
                                                    })
-                                               })
-                                           }}
-                                           cancelText="Отмена">
-                                           <Button style={{
-                                               backgroundColor: 'orange',
-                                               color: 'white'
-                                           }}>
-                                               Сохранить всех участников
-                                           </Button>
-                                       </Popconfirm>
-                                   </>
-                               ) : null}
+                                               }}
+                                               cancelText="Отмена">
+                                               <Button style={{
+                                                   backgroundColor: 'orange',
+                                                   color: 'white'
+                                               }}>
+                                                   Сохранить всех участников
+                                               </Button>
+                                           </Popconfirm>
+                                       </>
+                                   ) : null
+                               }
                            </Space>
                        )
                    }}

@@ -9,20 +9,20 @@ const Document = () => {
     const [document, setDocument] = React.useState([])
 
     React.useEffect(() => {
-        getAll(user.id).then((data) => {
+        user && getAll(user.id).then((data) => {
             setDocument(data)
         })
-    }, [user.id])
+    }, [user?.id])
 
     const columns = [
         {
-            title: 'ID',
+            title: '№ р/п',
             dataIndex: 'id',
             key: 'id',
             render: (text, record, index) => index + 1
         },
         {
-            title: 'Document Name',
+            title: 'Название документа',
             dataIndex: 'documentName',
             key: 'documentName',
             render: (text, record, index) => (

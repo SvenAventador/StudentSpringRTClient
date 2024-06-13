@@ -28,7 +28,6 @@ const Fashion = (props) => {
             Swal.fire(({
                 title: 'Внимание!',
                 text: 'Данный номер успешно удален!',
-                icon: 'success'
             })).then(() => {
                 onOk()
             })
@@ -40,7 +39,6 @@ const Fashion = (props) => {
     const showModal = (id) => {
         setIsActive(true)
         getOneApplication(id).then(({application}) => {
-            console.log(application)
             setOneApplication(application)
         })
     }
@@ -64,7 +62,7 @@ const Fashion = (props) => {
             key: 'category'
         },
         {
-            title: 'Директор',
+            title: 'Руководитель',
             dataIndex: 'fioDirector',
             key: 'fioDirector'
         },
@@ -154,14 +152,22 @@ const Fashion = (props) => {
                     <strong>Форма участия: </strong>
                     {record.form_participation?.form}
                 </p>
-                <p>
-                    <strong>Участники: </strong>
-                    {participantNames}
-                </p>
-                <p>
-                    <strong>Техническая группа: </strong>
-                    {technicalGroupNames}
-                </p>
+                {
+                    participantNames.length > 0 && (
+                        <p>
+                            <strong>Участники: </strong>
+                            {participantNames}
+                        </p>
+                    )
+                }
+                {
+                    technicalGroupNames.length > 0 && (
+                        <p>
+                            <strong>Техническая группа: </strong>
+                            {technicalGroupNames}
+                        </p>
+                    )
+                }
                 <p>
                     <b>Статус номера: </b>
                     <span style={{color: record.applicationStatusId === 1 ? 'gray' : record.applicationStatusId === 2 ? 'orange' : record.applicationStatusId === 3 ? 'red' : 'green'}}>

@@ -4,17 +4,21 @@ import {useUser} from "../../../stores/User";
 import { Table} from "antd";
 import {NavLink} from "react-router-dom";
 import {getDocument} from "../../../http/admin";
-const {inclineFirstname, inclineLastname, inclineMiddlename } = require('lvovich')
+const {
+    inclineFirstname,
+    inclineLastname,
+    inclineMiddlename
+} = require('lvovich')
 
 const Documents = () => {
     const {user} = useUser()
     const [document, setDocument] = React.useState([])
 
     React.useEffect(() => {
-        getDocument(user.id).then((data) => {
+        user && getDocument(user.id).then((data) => {
             setDocument(data)
         })
-    }, [user.id])
+    }, [user?.id])
 
     const columns = [
         {

@@ -1,5 +1,9 @@
 import React from 'react';
-import {deleteAll, getAllApplication, updateStatus} from "../../../http/application";
+import {
+    deleteAll,
+    getAllApplication,
+    updateStatus
+} from "../../../http/application";
 import {useUser} from "../../../stores/User";
 import Vocal from "./component/table/Vocal";
 import Instrumental from "./component/table/Instrumental";
@@ -10,7 +14,11 @@ import Fashion from "./component/table/Fashion";
 import Media from "./component/table/Media";
 import Video from "./component/table/Video";
 import Art from "./component/table/Art";
-import {Button, Popconfirm, Space} from "antd";
+import {
+    Button,
+    Popconfirm,
+    Space
+} from "antd";
 import ApplicationModal from "./modal/ApplicationModal";
 import Swal from "sweetalert2";
 import {createDocument} from "../../../http/document";
@@ -29,7 +37,7 @@ const Application = () => {
     const [allArt, setAllArt] = React.useState([]);
 
     React.useEffect(() => {
-        getAllApplication(user.id).then((data) => {
+        user && getAllApplication(user?.id).then((data) => {
             setAllVocal(data.allVocal);
             setAllInstrumental(data.allInstrumental);
             setAllDances(data.allDances);
@@ -40,7 +48,7 @@ const Application = () => {
             setAllVideo(data.allVideo);
             setAllArt(data.allArt);
         });
-    }, [user.id]);
+    }, [user?.id]);
 
     const [isActive, setIsActive] = React.useState(false);
     const showModal = () => {
@@ -77,36 +85,6 @@ const Application = () => {
         });
     };
 
-    // const hasApplications = () => {
-    //     return [
-    //         allVocal,
-    //         allInstrumental,
-    //         allDances,
-    //         allTheatre,
-    //         allOriginalGenre,
-    //         allFashion,
-    //         allMedia,
-    //         allVideo,
-    //         allArt
-    //     ].some(array => array.length > 0);
-    // };
-    //
-    // const isAnyApplicationApproved = () => {
-    //     const allApplications = [
-    //         ...allVocal,
-    //         ...allInstrumental,
-    //         ...allDances,
-    //         ...allTheatre,
-    //         ...allOriginalGenre,
-    //         ...allFashion,
-    //         ...allMedia,
-    //         ...allVideo,
-    //         ...allArt
-    //     ];
-    //
-    //     return allApplications.some(application => application.applicationStatusId === 1 || application.applicationStatusId === 3);
-    // };
-
     return (
         <>
             <Space size={"large"}
@@ -114,52 +92,46 @@ const Application = () => {
                        marginBottom: '1rem',
                        marginTop: '1rem'
                    }}>
-                    <Button style={{
-                        backgroundColor: 'green',
-                        color: 'white'
-                    }}
-                            onClick={showModal}>
-                        Добавить
-                    </Button>
-                )
-                    <Popconfirm title="Вы действительно хотите удалить все Ваши номера?"
-                                onConfirm={() => {
-                                    deleteAll(user.id).then(() => {
-                                        return getAllApplication(user.id);
-                                    }).then((data) => {
-                                        setAllVocal(data.allVocal);
-                                        setAllInstrumental(data.allInstrumental);
-                                        setAllDances(data.allDances);
-                                        setAllTheatre(data.allTheatre);
-                                        setAllOriginalGenre(data.allOriginalGenre);
-                                        setAllFashion(data.allFashion);
-                                        setAllMedia(data.allMedia);
-                                        setAllVideo(data.allVideo);
-                                        setAllArt(data.allArt);
+                <Button style={{
+                    backgroundColor: 'green',
+                    color: 'white'
+                }}
+                        onClick={showModal}>
+                    Добавить
+                </Button>
+                <Popconfirm title="Вы действительно хотите удалить все Ваши номера?"
+                            onConfirm={() => {
+                                deleteAll(user.id).then(() => {
+                                    return getAllApplication(user.id);
+                                }).then((data) => {
+                                    setAllVocal(data.allVocal);
+                                    setAllInstrumental(data.allInstrumental);
+                                    setAllDances(data.allDances);
+                                    setAllTheatre(data.allTheatre);
+                                    setAllOriginalGenre(data.allOriginalGenre);
+                                    setAllFashion(data.allFashion);
+                                    setAllMedia(data.allMedia);
+                                    setAllVideo(data.allVideo);
+                                    setAllArt(data.allArt);
 
-                                        return Swal.fire({
-                                            title: 'Внимание!',
-                                            text: 'Все номера успешно удалены!',
-                                            icon: 'success'
-                                        });
-                                    }).catch((error) => {
-                                        return Swal.fire({
-                                            title: 'Внимание!',
-                                            text: error.response.data.message,
-                                            icon: 'error'
-                                        });
+                                    return Swal.fire({
+                                        title: 'Внимание!',
+                                        text: 'Все номера успешно удалены!',
                                     });
-                                }}>
-                        <Button
-                            style={{
-                                backgroundColor: 'red',
-                                color: 'white'
-                            }}
-                        >
-                            Удалить все номера
-                        </Button>
-                    </Popconfirm>
-                )
+                                }).catch((error) => {
+                                    return Swal.fire({
+                                        title: 'Внимание!',
+                                        text: error.response.data.message,
+                                    });
+                                });
+                            }}>
+                    <Button style={{
+                        backgroundColor: 'red',
+                        color: 'white'
+                    }}>
+                        Удалить все номера
+                    </Button>
+                </Popconfirm>
                 <Popconfirm
                     title="Вы уверены, что хотите сохранить номера? После принятия данного действия, его нельзя будет отменить!"
                     onConfirm={() => {
@@ -167,7 +139,6 @@ const Application = () => {
                             Swal.fire({
                                 title: 'Внимание!',
                                 text: 'Поздравляем с успешным сохранением номеров!',
-                                icon: 'success'
                             }).then(() => {
                                 onOk();
                             });
@@ -180,15 +151,20 @@ const Application = () => {
                         Сохранить все номера
                     </Button>
                 </Popconfirm>
-                    <Button style={{
-                        backgroundColor: 'blue',
-                        color: 'white'
-                    }}
-                            onClick={() => {
-                                createDocument(user.id);
-                            }}>
-                        Сформировать документ
-                    </Button>
+                <Button style={{
+                    backgroundColor: 'blue',
+                    color: 'white'
+                }}
+                        onClick={() => {
+                            createDocument(user?.id).then(() => {
+                                return Swal.fire({
+                                    title: 'Внимание!',
+                                    text: 'Документ успешно сформирован!'
+                                })
+                            })
+                        }}>
+                    Сформировать документ
+                </Button>
             </Space>
 
             <Vocal allVocal={allVocal}

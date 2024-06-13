@@ -1,10 +1,25 @@
 import React from 'react';
-import {getAllProfile, updateAccountStatus, updateParticipant, updateProfile} from "../../../http/admin";
-import {Button, Input, Modal, Select, Space, Table} from "antd";
+import {
+    getAllProfile,
+    updateAccountStatus,
+    updateParticipant,
+    updateProfile
+} from "../../../http/admin";
+import {
+    Button,
+    Input,
+    Modal,
+    Select,
+    Space,
+    Table
+} from "antd";
 import {NavLink} from "react-router-dom";
 import Swal from "sweetalert2";
 import {getOne} from "../../../http/profile";
-import {deleteOne, getOne as oneGet} from "../../../http/participant";
+import {
+    deleteOne,
+    getOne as oneGet
+} from "../../../http/participant";
 import PhoneInput from "react-phone-input-2";
 
 const {Option} = Select;
@@ -64,20 +79,17 @@ const Participants = () => {
             });
             setMainModal(false)
             return Swal.fire({
-                icon: 'success',
                 title: 'Внимание!',
                 text: 'Поздравляем с успешным действием!'
             })
-
-
         }).catch((error) => {
             return Swal.fire({
-                icon: 'error',
                 title: 'Внимание!',
                 text: error.response.data.message
             })
         })
     }
+
     const updateMiddleData = () => {
         const participant = new FormData()
         participant.append('id', middleId)
@@ -86,12 +98,10 @@ const Participants = () => {
         participant.append('email', middleEmail)
         updateParticipant(participant).then(() => {
             getAllProfile().then((data) => {
-                console.log(data);
                 setAllProfiles(data);
             });
             setMiddleModal(false)
             return Swal.fire({
-                icon: 'success',
                 title: 'Внимание!',
                 text: 'Поздравляем с успешным действием!'
             })
@@ -99,7 +109,6 @@ const Participants = () => {
 
         }).catch((error) => {
             return Swal.fire({
-                icon: 'error',
                 title: 'Внимание!',
                 text: error.response.data.message
             })
@@ -192,7 +201,7 @@ const Participants = () => {
             key: 'patronymic',
         },
         {
-            title: 'Phone',
+            title: 'Номер телефона',
             dataIndex: 'phone',
             key: 'phone',
         },
@@ -221,26 +230,26 @@ const Participants = () => {
     const expandedSecondRowRender = (record) => {
         return (
             <>
-                <p>Дата рождения: {record.birthday}</p>
-                <p>Почта: {record.email}</p>
-                <p>Телефон: {record.phone}</p>
-                <p>Место учебы / работы: {record.placeOfStudyOfWork}</p>
-                <p>Специальность: {record.specialization}</p>
+                <p><strong>Дата рождения:</strong> {record.birthday}</p>
+                <p><strong>Почта:</strong> {record.email}</p>
+                <p><strong>Телефон:</strong> {record.phone}</p>
+                <p><strong>Место учебы / работы:</strong> {record.placeOfStudyOfWork}</p>
+                <p><strong>Специальность:</strong> {record.specialization}</p>
                 {
-                    record.positionOrStudyDocument.includes('.png') ? (
+                    record.positionOrStudyDocument.includes('.jpg') ? (
                         <>
                             <p>
-                                Справка с места учебы: <NavLink
+                                <strong>Справка с места учебы:</strong> <NavLink
                                 to={process.env.REACT_APP_API_PATH + record.positionOrStudyDocument}>просмотреть</NavLink>
                             </p>
                         </>
                     ) : (
-                        <p>Должность: {record.positionOrStudyDocument}</p>
+                        <p><strong>Должность:</strong> {record.positionOrStudyDocument}</p>
                     )
                 }
                 {
                     record.participant_comments.length > 0 ? (
-                        <p>Причина отклонения: {record.participant_comments[0].status}</p>
+                        <p><strong>Причина отклонения:</strong> {record.participant_comments[0].status}</p>
                     ) : null
 
                 }
@@ -266,7 +275,7 @@ const Participants = () => {
                 key: 'patronymic',
             },
             {
-                title: 'Phone',
+                title: 'Номер телефона',
                 dataIndex: 'phone',
                 key: 'phone',
             },
@@ -285,7 +294,7 @@ const Participants = () => {
                 render: (_, record) => (
                     <Select defaultValue={record.account_status.status}
                             onChange={(value) => handleSelectChange(value, record)}
-                            style={{width: 120}}>
+                            style={{width: 150}}>
                         <Option value="2">На проверке</Option>
                         <Option value="3">Отклонено</Option>
                         <Option value="4">Принято</Option>
@@ -297,7 +306,11 @@ const Participants = () => {
                 dataIndex: 'actions',
                 key: 'actions',
                 render: (_, record) => (
-                    <Space size={"large"}>
+                    <Space size={"large"}
+                           style={{
+                               display: "flex",
+                               flexFlow: "column"
+                           }}>
                         <Button style={{
                             backgroundColor: 'orange',
                             color: 'white'
@@ -330,12 +343,12 @@ const Participants = () => {
         ];
 
         return (
-            <Table
-                dataSource={record.participants}
-                columns={column}
-                rowKey="id"
-                expandable={{expandedRowRender: expandedSecondRowRender}}
-            />
+            <Table dataSource={record.participants}
+                   columns={column}
+                   rowKey="id"
+                   expandable={{
+                       expandedRowRender: expandedSecondRowRender
+                   }}/>
         );
     };
 
@@ -351,30 +364,32 @@ const Participants = () => {
                     showSizeChanger: false
                 }}
             />
-            <Modal
-                title="Укажите причину отклонения"
-                visible={modalVisible}
-                onCancel={() => setModalVisible(false)}
-                footer={[
-                    <Button key="cancel" onClick={() => {
-                        setModalVisible(false)
-                        getAllProfile().then((data) => {
-                            console.log(data);
-                            setAllProfiles(data);
-                        });
-                    }}>Отмена</Button>,
-                    <Button key="save" type="primary" onClick={handleSaveRejectReason}>Сохранить</Button>,
-                ]}
-            >
-                <Input.TextArea
-                    value={rejectReason}
-                    onChange={(e) => setRejectReason(e.target.value)}
-                    rows={4}
-                    placeholder="Введите причину отклонения"
-                />
+            <Modal title="Укажите причину отклонения"
+                   open={modalVisible}
+                   onCancel={() => setModalVisible(false)}
+                   footer={[
+                       <Button key="cancel" onClick={() => {
+                           setModalVisible(false)
+                           getAllProfile().then((data) => {
+                               setAllProfiles(data);
+                           });
+                       }}>
+                           Отмена
+                       </Button>,
+                       <Button key="save"
+                               type="primary"
+                               onClick={handleSaveRejectReason}>
+                           Сохранить
+                       </Button>
+                   ]}>
+                <Input.TextArea value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                                rows={4}
+                                placeholder="Введите причину отклонения"/>
             </Modal>
             <Modal title="Изменить данные руководителя"
                    open={mainModal}
+                   onCancel={closeMainModal}
                    footer={[
                        <Button style={{
                            backgroundColor: 'red',
@@ -388,14 +403,16 @@ const Participants = () => {
                                    backgroundColor: "green",
                                    color: 'white'
                                }}>
-                            Сохранить изменения
+                           Сохранить изменения
                        </Button>
-                   ]}
-            >
+                   ]}>
                 <PhoneInput country={'ru'}
                             placeholder="+7 (123) 456-78-90"
                             value={mainPhone}
-                            onChange={setMainPhone}/>
+                            onChange={setMainPhone}
+                            style={{
+                                marginBottom: '1rem'
+                            }}/>
                 <Input placeholder="Новый телеграм"
                        value={mainTg}
                        onChange={(e) => setMainTg(e.target.value)}/>
@@ -403,6 +420,7 @@ const Participants = () => {
 
             <Modal title="Изменить данные участника"
                    open={middleModal}
+                   onCancel={closeMiddleModal}
                    footer={[
                        <Button style={{
                            backgroundColor: 'red',
@@ -418,15 +436,20 @@ const Participants = () => {
                                }}>
                            Сохранить изменения
                        </Button>
-                   ]}
-            >
+                   ]}>
                 <PhoneInput country={'ru'}
                             placeholder="+7 (123) 456-78-90"
                             value={middlePhone}
-                            onChange={setMiddlePhone}/>
+                            onChange={setMiddlePhone}
+                            style={{
+                                marginBottom: '1rem'
+                            }}/>
                 <Input placeholder="Новый телеграм"
                        value={middleTg}
-                       onChange={(e) => setMiddleTg(e.target.value)}/>
+                       onChange={(e) => setMiddleTg(e.target.value)}
+                       style={{
+                           marginBottom: '1rem'
+                       }}/>
                 <Input placeholder="Новая почта"
                        value={middleEmail}
                        onChange={(e) => setMiddleEmail(e.target.value)}/>

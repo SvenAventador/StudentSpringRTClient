@@ -1,6 +1,17 @@
 import React from 'react';
-import {Button, Form, Input, Modal, Select} from "antd";
-import {getForms, getNomination, getParticipant, getTechGroup} from "../../../http/applicationData";
+import {
+    Button,
+    Form,
+    Input,
+    Modal,
+    Select
+} from "antd";
+import {
+    getForms,
+    getNomination,
+    getParticipant,
+    getTechGroup
+} from "../../../http/applicationData";
 
 import PhoneInput from "react-phone-input-2";
 import {update} from "../../../http/admin";
@@ -43,8 +54,9 @@ const EditApplication = (props) => {
 
                 form.setFieldsValue({
                     ...oneApplication,
-                    team: teamIds,
-                    tech: techIds,
+                    teamName: oneApplication.teamName === 'undefined' || oneApplication.teamName === undefined ? '' : oneApplication.teamName,
+                    team: teamIds || [],
+                    tech: techIds || [],
                 });
             }).catch(error => {
                 console.error("Error fetching nomination:", error);
@@ -63,14 +75,13 @@ const EditApplication = (props) => {
             application.append('teamName', values.teamName)
             application.append('formParticipationId', values.formParticipationId)
             values.team.forEach(member => application.append('team', member));
-            values.tech.forEach(group => application.append('tech', group));
+            values.tech && values.tech.forEach(group => application.append('tech', group));
 
             if (oneApplication) {
                 update(oneApplication?.id, application).then(() => {
                     Swal.fire({
                         title: 'Внимание',
                         text: 'Поздравялем с успешным обновлением номера!',
-                        icon: 'success'
                     }).then(() => {
                         onOk()
                         onCancel()
@@ -80,7 +91,6 @@ const EditApplication = (props) => {
                     return Swal.fire({
                         title: 'Внимание',
                         text: error.response.data.message,
-                        icon: 'error'
                     })
                 })
             }
@@ -89,34 +99,54 @@ const EditApplication = (props) => {
         })
     }
 
+    const validateTeamSize = (rule, value) => {
+        const formParticipationId = form.getFieldValue('formParticipationId');
+        if (formParticipationId === 1 && value.length !== 1) {
+            return Promise.reject(new Error('Выберите ровно одного участника!'));
+        } else if (formParticipationId === 2 && (value.length < 2 || value.length > 5)) {
+            return Promise.reject(new Error('Выберите от 2 до 5 участников!'));
+        } else if (formParticipationId === 3 && value.length < 6) {
+            return Promise.reject(new Error('Выберите как минимум 6 участников!'));
+        }
+        return Promise.resolve();
+    };
+
+    const handleFormParticipationChange = (value) => {
+        form.setFieldsValue({
+            team: []
+        });
+        form.validateFields(['team']);
+    };
+
+
+    React.useEffect(() => {
+        form.validateFields(['team']);
+    }, [form.getFieldValue('formParticipationId')]);
+
     return (
-        <Modal
-            open={open}
-            title="Изменить данные"
-            onCancel={onCancel}
-            footer={[
-                <Button key="cancel"
-                        style={{
-                            backgroundColor: 'red',
-                            color: "white"
-                        }}
-                        onClick={onCancel}>
-                    Отмена
-                </Button>,
-                <Button key="submit"
-                        style={{
-                            backgroundColor: 'green',
-                            color: "white"
-                        }}
-                        onClick={handleOk}>
-                    Сохранить
-                </Button>,
-            ]}
-        >
-            <Form
-                form={form}
-                layout="vertical"
-            >
+        <Modal open={open}
+               title="Изменить данные"
+               onCancel={onCancel}
+               footer={[
+                   <Button key="cancel"
+                           style={{
+                               backgroundColor: 'red',
+                               color: "white"
+                           }}
+                           onClick={onCancel}>
+                       Отмена
+                   </Button>,
+                   <Button key="submit"
+                           style={{
+                               backgroundColor: 'green',
+                               color: "white"
+                           }}
+                           onClick={handleOk}>
+                       Сохранить
+                   </Button>
+               ]}>
+            <Form form={form}
+                  layout="vertical">
                 <Form.Item name="name"
                            label="Название номера"
                            rules={[
@@ -176,33 +206,45 @@ const EditApplication = (props) => {
                                    message: 'Пожалуйста, выберите форму участия!'
                                }
                            ]}>
-                    <Select placeholder="Выберите форму участия">
+                    <Select placeholder="Выберите форму участия" onChange={handleFormParticipationChange}>
                         {
                             formParticipation.map((form) => (
-                                <Option key={form.id}
-                                        value={form.id}>
+                                <Option key={form.id} value={form.id}>
                                     {form.form}
                                 </Option>
                             ))
                         }
                     </Select>
                 </Form.Item>
-                <Form.Item name="teamName"
-                           label="Название коллектива"
-                           rules={[
-                               {
-                                   required: true,
-                                   message: 'Пожалуйста, введите название коллектива!'
-                               }
-                           ]}>
-                    <Input/>
+                <Form.Item noStyle
+                           shouldUpdate={(prevValues, currentValues) => prevValues.formParticipationId !== currentValues.formParticipationId}>
+                    {({getFieldValue}) => {
+                        return getFieldValue('formParticipationId') !== 1 ? (
+                            <Form.Item
+                                name="teamName"
+                                label="Название команды"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Пожалуйста, введите название группового коллектива!'
+                                    }
+                                ]}
+                            >
+                                <Input/>
+                            </Form.Item>
+                        ) : null;
+                    }}
                 </Form.Item>
+
                 <Form.Item name="team"
                            label="Участники"
                            rules={[
                                {
                                    required: true,
                                    message: 'Выберите состав участников!'
+                               },
+                               {
+                                   validator: validateTeamSize
                                }
                            ]}>
                     <Select mode="multiple"
@@ -211,20 +253,15 @@ const EditApplication = (props) => {
                             teamMembers.map((member) => (
                                 <Option key={member.id}
                                         value={member.id}>
-                                    {member?.surname || ''} {member?.name || ''} {member?.patronymic || ''}
+                                    {member.surname} {member.name} {member.patronymic}
                                 </Option>
                             ))
                         }
                     </Select>
                 </Form.Item>
+
                 <Form.Item name="tech"
-                           label="Техническая группа"
-                           rules={[
-                               {
-                                   required: true,
-                                   message: 'Пожалуйста, выберите техническую группу!'
-                               }
-                           ]}>
+                           label="Техническая группа">
                     <Select mode="multiple"
                             placeholder="Выберите техническую группу">
                         {

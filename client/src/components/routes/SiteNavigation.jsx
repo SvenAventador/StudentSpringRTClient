@@ -18,16 +18,17 @@ import Document from "../../pages/home/Document";
 import Authorization from "../../pages/auth/Authorization";
 import Person from "../../pages/account/Person";
 import Application from "../../pages/account/partials/Application";
-import PersonMain from "../../pages/account/partials/Main";
 import Profile from "../../pages/account/partials/Profile";
 import Team from "../../pages/account/partials/Team";
 
 import {
-    ACCOUNT_PATH, ADMIN_PATH,
+    ACCOUNT_PATH,
+    ADMIN_PATH,
     APPLICATION_PATH,
     AUTH_PATH,
     CONTACT_PATH,
-    DOCUMENT_PATH, INSPECTOR_PATH,
+    DOCUMENT_PATH,
+    INSPECTOR_PATH,
     MAIN_PATH,
     PROFILE_PATH,
     TEAM_PATH,
@@ -65,8 +66,7 @@ const SiteNavigation = createBrowserRouter(
                 <Route path={ACCOUNT_PATH}
                        element={<Person/>}>
                     <Route index
-                           element={<PersonMain/>}/>
-                    <Route path={PROFILE_PATH}
+                           path={PROFILE_PATH}
                            element={<Profile/>}/>
                     <Route path={TEAM_PATH}
                            element={<Team/>}/>
@@ -78,14 +78,14 @@ const SiteNavigation = createBrowserRouter(
             <Route element={<Admin/>}>
                 <Route path={ADMIN_PATH}
                        element={<Administrator/>}>
-                    <Route index element={<Participants />} />
+                    <Route index
+                           element={<Participants/>}/>
                 </Route>
             </Route>
 
             <Route element={<Inspector/>}>
                 <Route path={INSPECTOR_PATH}
                        element={<Validators/>}>
-
                 </Route>
             </Route>
         </Route>

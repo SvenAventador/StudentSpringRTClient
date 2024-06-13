@@ -40,19 +40,30 @@ const ApplicationModal = (props) => {
     const [formParticipation, setFormParticipation] = React.useState([])
 
     React.useEffect(() => {
-        getParticipant(user.id).then((data) => {
+        user && getParticipant(user?.id).then((data) => {
             setTeamMembers(data)
         })
-        getTechGroup(user.id).then((data) => {
+        user && getTechGroup(user?.id).then((data) => {
             setTechGroups(data)
         })
-        getDirection().then((data) => {
+        user && getDirection().then((data) => {
             setDirections(data)
         })
-        getForms().then((data) => {
+        user && getForms().then((data) => {
             setFormParticipation(data)
         })
-    }, [user.id])
+    }, [user?.id])
+
+    React.useEffect(() => {
+        getNomination(1).then((data) => {
+            setNominations(data)
+
+            form.setFieldsValue({
+                directionId: 1,
+                formParticipationId: 1
+            })
+        })
+    }, [form])
 
     React.useEffect(() => {
         if (oneApplication && oneApplication.directionId) {
@@ -66,6 +77,7 @@ const ApplicationModal = (props) => {
                     duration: moment(oneApplication.duration, 'mm:ss'),
                     team: teamIds,
                     tech: techIds,
+                    teamName: oneApplication.teamName === 'undefined' || oneApplication.teamName === undefined ? '' : oneApplication.teamName
                 });
             }).catch(error => {
                 console.error("Error fetching nomination:", error);
@@ -94,19 +106,18 @@ const ApplicationModal = (props) => {
             application.append('telegramContactPerson', values.telegramContactPerson)
             application.append('fioDirector', values.fioDirector)
             application.append('teamName', values.teamName)
-            application.append('profileId', user.id)
+            application.append('profileId', user?.id)
             application.append('directionId', values.directionId)
             application.append('nominationId', values.nominationId)
             application.append('formParticipationId', values.formParticipationId)
             values.team.forEach(member => application.append('team', member));
-            values.tech.forEach(group => application.append('tech', group));
+            values.tech && values.tech.forEach(group => application.append('tech', group));
 
             if (oneApplication) {
                 update(oneApplication?.id, application).then(() => {
                     Swal.fire({
                         title: 'Внимание',
                         text: 'Поздравялем с успешным обновлением номера!',
-                        icon: 'success'
                     }).then(() => {
                         onOk()
                         onCancel()
@@ -116,7 +127,6 @@ const ApplicationModal = (props) => {
                     return Swal.fire({
                         title: 'Внимание',
                         text: error.response.data.message,
-                        icon: 'error'
                     })
                 })
             } else {
@@ -124,7 +134,6 @@ const ApplicationModal = (props) => {
                     Swal.fire({
                         title: 'Внимание',
                         text: 'Поздравялем с успешным добавлением номера!',
-                        icon: 'success'
                     }).then(() => {
                         onOk()
                         form.resetFields()
@@ -133,7 +142,6 @@ const ApplicationModal = (props) => {
                     return Swal.fire({
                         title: 'Внимание',
                         text: error.response.data.message,
-                        icon: 'error'
                     })
                 })
             }
@@ -149,6 +157,38 @@ const ApplicationModal = (props) => {
         }
         return minutes;
     }
+
+    const validateTeamSize = (rule, value) => {
+        const formParticipationId = form.getFieldValue('formParticipationId');
+        if (formParticipationId === 1 && value.length !== 1) {
+            return Promise.reject(new Error('Выберите ровно одного участника!'));
+        } else if (formParticipationId === 2 && (value.length < 2 || value.length > 5)) {
+            return Promise.reject(new Error('Выберите от 2 до 5 участников!'));
+        } else if (formParticipationId === 3 && value.length < 6) {
+            return Promise.reject(new Error('Выберите как минимум 6 участников!'));
+        }
+        return Promise.resolve();
+    };
+
+    const handleFormParticipationChange = (value) => {
+        form.setFieldsValue({
+            team: []
+        });
+        form.validateFields(['team']);
+    };
+
+
+    React.useEffect(() => {
+        form.validateFields(['team']);
+    }, [form.getFieldValue('formParticipationId')]);
+
+    const validateDuration = (_, value) => {
+        const duration = moment.duration(value);
+        if (duration.asMinutes() <= 0 || duration.asMinutes() >= 15) {
+            return Promise.resolve();
+        }
+        return Promise.reject(new Error('Длительность должна быть больше 00:00 и меньше 15:00'));
+    };
 
     return (
         <Modal open={open}
@@ -195,17 +235,20 @@ const ApplicationModal = (props) => {
                                {
                                    required: true,
                                    message: 'Пожалуйста, выберите длительность!'
+                               },
+                               {
+                                   validator: validateDuration
                                }
                            ]}>
-                    <TimePicker
-                        format="mm:ss"
-                        defaultOpenValue={moment('00:00', 'mm:ss')}
-                        value={form.getFieldValue('duration')}
-                        onChange={(time) => form.setFieldsValue({ duration: time })}
-                        disabledHours={() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}
-                        disabledMinutes={disabledMinutes}
+                    <TimePicker format="mm:ss"
+                                defaultOpenValue={moment('00:00', 'mm:ss')}
+                                value={form.getFieldValue('duration')}
+                                onChange={(time) => form.setFieldsValue({duration: time})}
+                                disabledHours={() => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}
+                                disabledMinutes={disabledMinutes}
                     />
                 </Form.Item>
+
                 <Form.Item name="category"
                            label="Категория выступления"
                            initialValue="Профильная"
@@ -260,10 +303,10 @@ const ApplicationModal = (props) => {
                            rules={[
                                {
                                    required: true,
-                                   message: 'Пожалуйста, введите телефон контактного лица!'
+                                   message: 'Пожалуйста, введите телеграм контактного лица!'
                                }
                            ]}>
-                    <Input/>
+                    <Input prefix="https://t.me/"/>
                 </Form.Item>
                 <Form.Item name="fioDirector"
                            label="ФИО руководителя коллектива"
@@ -314,16 +357,6 @@ const ApplicationModal = (props) => {
                         }
                     </Select>
                 </Form.Item>
-                <Form.Item name="teamName"
-                           label="Название коллектива"
-                           rules={[
-                               {
-                                   required: true,
-                                   message: 'Пожалуйста, введите название коллектива!'
-                               }
-                           ]}>
-                    <Input/>
-                </Form.Item>
                 <Form.Item name="formParticipationId"
                            label="Форма участия"
                            rules={[
@@ -332,23 +365,47 @@ const ApplicationModal = (props) => {
                                    message: 'Пожалуйста, выберите форму участия!'
                                }
                            ]}>
-                    <Select placeholder="Выберите форму участия">
+                    <Select placeholder="Выберите форму участия" onChange={handleFormParticipationChange}>
                         {
                             formParticipation.map((form) => (
-                                <Option key={form.id}
-                                        value={form.id}>
+                                <Option key={form.id} value={form.id}>
                                     {form.form}
                                 </Option>
                             ))
                         }
                     </Select>
                 </Form.Item>
+                <Form.Item
+                    noStyle
+                    shouldUpdate={(prevValues, currentValues) => prevValues.formParticipationId !== currentValues.formParticipationId}
+                >
+                    {({getFieldValue}) => {
+                        return getFieldValue('formParticipationId') !== 1 ? (
+                            <Form.Item
+                                name="teamName"
+                                label="Название команды"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Пожалуйста, введите название группового коллектива!'
+                                    }
+                                ]}
+                            >
+                                <Input/>
+                            </Form.Item>
+                        ) : null;
+                    }}
+                </Form.Item>
+
                 <Form.Item name="team"
                            label="Участники"
                            rules={[
                                {
                                    required: true,
                                    message: 'Выберите состав участников!'
+                               },
+                               {
+                                   validator: validateTeamSize
                                }
                            ]}>
                     <Select mode="multiple"
@@ -364,13 +421,7 @@ const ApplicationModal = (props) => {
                     </Select>
                 </Form.Item>
                 <Form.Item name="tech"
-                           label="Техническая группа"
-                           rules={[
-                               {
-                                   required: true,
-                                   message: 'Пожалуйста, выберите техническую группу!'
-                               }
-                           ]}>
+                           label="Техническая группа">
                     <Select mode="multiple"
                             placeholder="Выберите техническую группу">
                         {

@@ -1,17 +1,16 @@
 import React from 'react';
 import {NavLink} from "react-router-dom";
 import {
-    ACCOUNT_PATH,
+    ACCOUNT_PATH, ADMIN_PATH,
     AUTH_PATH,
     CONTACT_PATH,
-    DOCUMENT_PATH,
+    DOCUMENT_PATH, INSPECTOR_PATH,
     MAIN_PATH,
     VENUES_PATH
 } from "../../utils/const";
 import leagueLogo from '../../assets/images/cat.png'
 import cat from '../../assets/images/LeagueStudent.png'
 import {useUser} from "../../stores/User";
-
 
 
 const Header = () => {
@@ -61,7 +60,10 @@ const Header = () => {
                 </nav>
 
                 <NavLink className="link"
-                         to={user ? ACCOUNT_PATH : AUTH_PATH}>
+                         to={
+                             user ? (user?.userRole === "Участник" ? ACCOUNT_PATH : (user?.userRole === "Администратор" ? ADMIN_PATH : INSPECTOR_PATH))
+                                 : AUTH_PATH
+                         }>
                     {user ? 'Личный кабинет' : 'Войти'}
                 </NavLink>
             </div>

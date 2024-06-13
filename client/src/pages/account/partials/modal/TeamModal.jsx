@@ -11,7 +11,10 @@ import PhoneInput from "react-phone-input-2";
 import moment from "moment/moment";
 import {UploadOutlined} from '@ant-design/icons';
 import {useUser} from "../../../../stores/User";
-import {create, update} from "../../../../http/participant";
+import {
+    create,
+    update
+} from "../../../../http/participant";
 import Swal from "sweetalert2";
 
 const {Option} = Select;
@@ -38,7 +41,7 @@ const TeamModal = (props) => {
                 gender: oneParticipant?.gender || 'Мужской',
                 email: oneParticipant?.email || '',
                 phone: oneParticipant?.phone || '',
-                telegramLink: oneParticipant?.telegramLink || 'https://t.me/',
+                telegramLink: oneParticipant?.telegramLink.substring(13) || '',
                 placeOfStudyOfWork: oneParticipant?.placeOfStudyOfWork || '',
                 specialization: oneParticipant?.specialization || '',
                 positionOrStudyDocument: oneParticipant?.positionOrStudyDocument || '',
@@ -77,13 +80,11 @@ const TeamModal = (props) => {
                 update(oneParticipant.id, participant).then(() => {
                     handleCancel();
                     return Swal.fire({
-                        icon: "success",
                         title: 'Внимание',
                         text: 'Поздравляем с успешным обновлением данных участника!'
                     })
                 }).catch((error) => {
                     return Swal.fire({
-                        icon: "error",
                         title: 'Внимание',
                         text: error.response.data.message
                     })
@@ -92,13 +93,11 @@ const TeamModal = (props) => {
                 create(participant).then(() => {
                     handleCancel()
                     return Swal.fire({
-                        icon: "success",
                         title: 'Внимание',
                         text: 'Поздравляем с успешным добавлением участника!'
                     })
                 }).catch((error) => {
                     return Swal.fire({
-                        icon: "error",
                         title: 'Внимание',
                         text: error.response.data.message
                     })
@@ -131,7 +130,7 @@ const TeamModal = (props) => {
             console.error('Image must smaller than 2MB!')
         }
         return isJpg && isLt2M
-    };
+    }
 
     const customUpload = ({onSuccess}) => {
         setTimeout(() => {
@@ -150,6 +149,7 @@ const TeamModal = (props) => {
                 <Form form={form}
                       layout="vertical"
                       initialValues={oneParticipant}>
+
                     <Form.Item name="participantStatusId"
                                label="Статус участника"
                                rules={[
@@ -169,6 +169,7 @@ const TeamModal = (props) => {
                             }
                         </Select>
                     </Form.Item>
+
                     <Form.Item name="surname"
                                label="Фамилия"
                                rules={[
@@ -179,6 +180,7 @@ const TeamModal = (props) => {
                                ]}>
                         <Input/>
                     </Form.Item>
+
                     <Form.Item name="name"
                                label="Имя"
                                rules={[
@@ -189,10 +191,12 @@ const TeamModal = (props) => {
                                ]}>
                         <Input/>
                     </Form.Item>
+
                     <Form.Item name="patronymic"
                                label="Отчество">
                         <Input/>
                     </Form.Item>
+
                     <Form.Item name="birthday"
                                label="Дата рождения"
                                rules={[
@@ -213,6 +217,7 @@ const TeamModal = (props) => {
                                    paddingLeft: '.5rem'
                                }}/>
                     </Form.Item>
+
                     <Form.Item name="gender"
                                label="Пол"
                                rules={[
@@ -230,6 +235,7 @@ const TeamModal = (props) => {
                             </Option>
                         </Select>
                     </Form.Item>
+
                     <Form.Item name="email"
                                label="Email"
                                rules={[
@@ -241,6 +247,7 @@ const TeamModal = (props) => {
                                ]}>
                         <Input/>
                     </Form.Item>
+
                     <Form.Item name="phone"
                                label="Телефон"
                                rules={[
@@ -252,6 +259,7 @@ const TeamModal = (props) => {
                         <PhoneInput country={'ru'}
                                     placeholder="+7 (123) 456-78-90"/>
                     </Form.Item>
+
                     <Form.Item name="telegramLink"
                                label="Ссылка на Telegram"
                                rules={[
@@ -260,16 +268,31 @@ const TeamModal = (props) => {
                                        message: 'Введите ссылку на Telegram'
                                    }
                                ]}>
-                        <Input/>
+                        <Input prefix="https://t.me/"/>
                     </Form.Item>
+
                     <Form.Item name="placeOfStudyOfWork"
-                               label="Место учебы/работы">
+                               label="Место учебы/работы"
+                               rules={[
+                                   {
+                                       required: true,
+                                       message: 'Введите Ваше место учебы/работы!'
+                                   }
+                               ]}>
                         <Input/>
                     </Form.Item>
+
                     <Form.Item name="specialization"
-                               label="Специализация">
+                               label="Специальность"
+                               rules={[
+                                   {
+                                       required: true,
+                                       message: 'Введите Вашу специальность!'
+                                   }
+                               ]}>
                         <Input/>
                     </Form.Item>
+
                     <Form.Item
                         shouldUpdate={(prevValues, currentValues) => prevValues.participantStatusId !== currentValues.participantStatusId}>
                         {
@@ -282,6 +305,10 @@ const TeamModal = (props) => {
                                                    {
                                                        required: participantStatusId === 1,
                                                        message: 'Загрузите документ'
+                                                   },
+                                                   {
+                                                       required: participantStatusId === 2 || participantStatusId === 3,
+                                                       message: 'Пожалуйста, введите должность!'
                                                    }
                                                ]}>
                                         {
@@ -305,6 +332,7 @@ const TeamModal = (props) => {
                             }
                         }
                     </Form.Item>
+
                 </Form>
             </Modal>
         </>
